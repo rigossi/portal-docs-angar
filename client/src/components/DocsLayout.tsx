@@ -27,16 +27,16 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         <div className="container flex h-16 items-center">
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-lg">A</span>
+              <span className="text-primary-foreground font-bold text-lg">P</span>
             </div>
             <div className="flex flex-col">
-              <span className="font-semibold text-lg leading-none">API Angar</span>
+              <span className="font-semibold text-lg leading-none">API Parcred Brasil</span>
               <span className="text-xs text-muted-foreground">Documentação</span>
             </div>
           </div>
           <div className="ml-auto flex items-center gap-4">
             <Button variant="outline" size="sm" asChild>
-              <a href="https://api-angar-homologacao.onrender.com/health" target="_blank" rel="noopener noreferrer">
+              <a href="https://api-parcred-homologacao.onrender.com/health" target="_blank" rel="noopener noreferrer">
                 Status da API
               </a>
             </Button>
@@ -80,7 +80,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
       <footer className="border-t py-6 md:py-0">
         <div className="container flex flex-col items-center justify-between gap-4 md:h-16 md:flex-row">
           <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
-            © 2025 Angar. Todos os direitos reservados.
+            © 2025 Parcred Brasil. Todos os direitos reservados.
           </p>
           <p className="text-center text-sm text-muted-foreground">
             Versão 1.0.0

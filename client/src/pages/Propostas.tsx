@@ -9,7 +9,7 @@ import { Link } from "wouter";
 export default function Propostas() {
   const requestExample = `TOKEN="SEU_TOKEN_DE_ACESSO"
 
-curl -X POST https://api-angar-homologacao.onrender.com/v1/propostas \\
+curl -X POST https://api-parcred-homologacao.onrender.com/v1/propostas \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer $TOKEN" \\
   -d '{
@@ -38,7 +38,7 @@ curl -X POST https://api-angar-homologacao.onrender.com/v1/propostas \\
         "ultimo_vencimento": "2027-12-15"
       }
     },
-    "webhook_url": "https://api.seu-sistema.com/webhook/angar"
+    "webhook_url": "https://api.seu-sistema.com/webhook/parcred"
   }'`;
 
   const responseExample = `{
@@ -64,7 +64,7 @@ curl -X POST https://api-angar-homologacao.onrender.com/v1/propostas \\
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold tracking-tight">Visão Geral</h2>
           <p className="text-muted-foreground">
-            Após autenticar, você pode enviar propostas de empréstimo contendo os dados do cliente e da simulação financeira. A API Angar processará a proposta e enviará uma mensagem via WhatsApp para o cliente confirmar ou recusar.
+            Após autenticar, você pode enviar propostas de empréstimo contendo os dados do cliente e da simulação financeira. A API Parcred Brasil processará a proposta e enviará uma mensagem via WhatsApp para o cliente confirmar ou recusar.
           </p>
         </div>
 

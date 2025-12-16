@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { AlertCircle, Book, CheckCircle } from "lucide-react";
 
 export default function GuiaCompleto() {
-  const step1Code = `TOKEN=$(curl -s -X POST https://api-angar-homologacao.onrender.com/v1/login \\
+  const step1Code = `TOKEN=$(curl -s -X POST https://api-parcred-homologacao.onrender.com/v1/login \\
   -H "Content-Type: application/json" \\
   -d '{"client_id":"parceiro_abc_123","client_secret":"dK$!s#@j9sA*d(s@D*j"}' \\
   | jq -r '.access_token')
@@ -14,7 +14,7 @@ echo "Token: $TOKEN"`;
 
   const step2Code = `WEBHOOK_URL="https://webhook.site/sua-url-unica"
 
-RESPONSE=$(curl -s -X POST https://api-angar-homologacao.onrender.com/v1/propostas \\
+RESPONSE=$(curl -s -X POST https://api-parcred-homologacao.onrender.com/v1/propostas \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer $TOKEN" \\
   -d "{
@@ -49,7 +49,7 @@ RESPONSE=$(curl -s -X POST https://api-angar-homologacao.onrender.com/v1/propost
 PROPOSTA_ID=$(echo "$RESPONSE" | jq -r '.id_proposta_angar')
 echo "Proposta criada com ID: $PROPOSTA_ID"`;
 
-  const step3Code = `curl "https://api-angar-homologacao.onrender.com/confirmar/$PROPOSTA_ID?acao=aceitar"`;
+  const step3Code = `curl "https://api-parcred-homologacao.onrender.com/confirmar/$PROPOSTA_ID?acao=aceitar"`;
 
   return (
     <DocsLayout>
@@ -85,7 +85,7 @@ echo "Proposta criada com ID: $PROPOSTA_ID"`;
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Credenciais de Teste</AlertTitle>
             <AlertDescription>
-              Para este guia, usaremos as credenciais de teste fornecidas. Em produção, você receberá suas próprias credenciais da equipe Angar.
+              Para este guia, usaremos as credenciais de teste fornecidas. Em produção, você receberá suas próprias credenciais da equipe Parcred Brasil.
             </AlertDescription>
           </Alert>
         </div>
@@ -158,7 +158,7 @@ echo "Proposta criada com ID: $PROPOSTA_ID"`;
           </p>
 
           <CodeBlock
-            code="https://api-angar-homologacao.onrender.com/confirmar/[PROPOSTA_ID]?acao=aceitar"
+            code="https://api-parcred-homologacao.onrender.com/confirmar/[PROPOSTA_ID]?acao=aceitar"
             language="url"
           />
 
@@ -200,7 +200,7 @@ echo "Proposta criada com ID: $PROPOSTA_ID"`;
               <div>
                 <h4 className="font-semibold mb-2">Payload</h4>
                 <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                  <li><code className="bg-muted px-1.5 py-0.5 rounded">id_proposta_angar</code> - ID da proposta Angar</li>
+                  <li><code className="bg-muted px-1.5 py-0.5 rounded">id_proposta_angar</code> - ID da proposta Parcred Brasil</li>
                   <li><code className="bg-muted px-1.5 py-0.5 rounded">id_proposta_parceiro</code> - Seu ID (TESTE-INTEGRACAO-001)</li>
                   <li><code className="bg-muted px-1.5 py-0.5 rounded">status</code> - ACEITO</li>
                   <li><code className="bg-muted px-1.5 py-0.5 rounded">timestamp</code> - Data/hora do evento</li>
@@ -225,7 +225,7 @@ echo "Proposta criada com ID: $PROPOSTA_ID"`;
             Para testar o fluxo de recusa, repita os passos 2 e 3, mas no Passo 3 use:
           </p>
           <CodeBlock
-            code="https://api-angar-homologacao.onrender.com/confirmar/[PROPOSTA_ID]?acao=recusar"
+            code="https://api-parcred-homologacao.onrender.com/confirmar/[PROPOSTA_ID]?acao=recusar"
             language="url"
           />
           <p className="text-muted-foreground">
@@ -285,7 +285,7 @@ echo "Proposta criada com ID: $PROPOSTA_ID"`;
                 Após validar a integração em homologação, você está pronto para implementar em produção:
               </p>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Solicite suas credenciais de produção à equipe Angar</li>
+                <li>Solicite suas credenciais de produção à equipe Parcred Brasil</li>
                 <li>Implemente a validação de assinatura HMAC no seu webhook</li>
                 <li>Altere a URL base para o ambiente de produção</li>
                 <li>Configure monitoramento e logs</li>
@@ -307,8 +307,8 @@ echo "Proposta criada com ID: $PROPOSTA_ID"`;
                 Em caso de dúvidas ou problemas durante a integração, entre em contato com nossa equipe de suporte técnico:
               </p>
               <p className="mt-3">
-                <a href="mailto:suporte-integracao@angar.com.br" className="text-primary hover:underline">
-                  suporte-integracao@angar.com.br
+                <a href="mailto:administrador.ti@parcredbrasil.com.br" className="text-primary hover:underline">
+                  administrador.ti@parcredbrasil.com.br
                 </a>
               </p>
             </CardContent>

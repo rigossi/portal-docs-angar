@@ -104,7 +104,7 @@ app.listen(3000, () => {
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold tracking-tight">Visão Geral</h2>
           <p className="text-muted-foreground">
-            Quando o cliente final interagir com a proposta (aceitando ou recusando), a API Angar enviará uma notificação POST para a URL de webhook que você informou ao criar a proposta.
+            Quando o cliente final interagir com a proposta (aceitando ou recusando), a API Parcred Brasil enviará uma notificação POST para a URL de webhook que você informou ao criar a proposta.
           </p>
         </div>
 
@@ -152,7 +152,7 @@ app.listen(3000, () => {
                   <TableRow>
                     <TableCell className="font-mono">id_proposta_angar</TableCell>
                     <TableCell>String</TableCell>
-                    <TableCell>ID da proposta no sistema Angar</TableCell>
+                    <TableCell>ID da proposta no sistema Parcred Brasil</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell className="font-mono">id_proposta_parceiro</TableCell>
@@ -191,12 +191,12 @@ app.listen(3000, () => {
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Validação Obrigatória</AlertTitle>
             <AlertDescription>
-              Para garantir que a requisição veio da Angar, cada webhook é assinado usando <strong>HMAC-SHA256</strong>. A assinatura é enviada no header <code>x-angar-signature</code>. É fundamental que você valide esta assinatura antes de processar o webhook.
+              Para garantir que a requisição veio da Parcred Brasil, cada webhook é assinado usando <strong>HMAC-SHA256</strong>. A assinatura é enviada no header <code>x-angar-signature</code>. É fundamental que você valide esta assinatura antes de processar o webhook.
             </AlertDescription>
           </Alert>
 
           <p className="text-muted-foreground">
-            A chave secreta (<code className="bg-muted px-1.5 py-0.5 rounded">KEY_ANGAR</code>) será fornecida pela equipe Angar. Mantenha-a segura e nunca a exponha publicamente.
+            A chave secreta (<code className="bg-muted px-1.5 py-0.5 rounded">KEY_ANGAR</code>) será fornecida pela equipe Parcred Brasil. Mantenha-a segura e nunca a exponha publicamente.
           </p>
 
           <CodeBlock code={validationExample} language="javascript" title="Função de Validação (Node.js)" />
@@ -212,7 +212,7 @@ app.listen(3000, () => {
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold tracking-tight">Resposta Esperada</h2>
           <p className="text-muted-foreground">
-            Seu endpoint deve responder com <code className="bg-muted px-1.5 py-0.5 rounded">HTTP 200 OK</code> em até 10 segundos. Caso contrário, a API Angar poderá considerar a entrega como falha.
+            Seu endpoint deve responder com <code className="bg-muted px-1.5 py-0.5 rounded">HTTP 200 OK</code> em até 10 segundos. Caso contrário, a API Parcred Brasil poderá considerar a entrega como falha.
           </p>
           <CodeBlock
             code={`{

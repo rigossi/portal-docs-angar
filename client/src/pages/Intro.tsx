@@ -11,9 +11,9 @@ export default function Intro() {
       <div className="space-y-8">
         {/* Hero Section */}
         <div className="space-y-4">
-          <h1 className="text-4xl font-bold tracking-tight">API de Empréstimos Angar</h1>
+          <h1 className="text-4xl font-bold tracking-tight">API de Empréstimos Parcred Brasil</h1>
           <p className="text-xl text-muted-foreground">
-            Documentação completa para integração com a plataforma de empréstimos pessoais da Angar.
+            Documentação completa para integração com a plataforma de empréstimos pessoais da Parcred Brasil.
           </p>
         </div>
 
@@ -22,7 +22,7 @@ export default function Intro() {
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Comece Rapidamente</AlertTitle>
           <AlertDescription>
-            Esta documentação fornece tudo que você precisa para integrar sua aplicação com a API Angar.
+            Esta documentação fornece tudo que você precisa para integrar sua aplicação com a API Parcred Brasil.
             Siga os passos em ordem para uma integração bem-sucedida.
           </AlertDescription>
         </Alert>
@@ -41,7 +41,7 @@ export default function Intro() {
               </CardHeader>
               <CardContent>
                 <CodeBlock
-                  code="https://api-angar-homologacao.onrender.com"
+                  code="https://api-parcred-homologacao.onrender.com"
                   language="url"
                 />
                 <p className="mt-3 text-sm text-muted-foreground">
@@ -60,7 +60,7 @@ export default function Intro() {
               </CardHeader>
               <CardContent>
                 <CodeBlock
-                  code="https://api-angar-producao.onrender.com"
+                  code="https://api-parcred-producao.onrender.com"
                   language="url"
                 />
                 <p className="mt-3 text-sm text-muted-foreground">
@@ -75,7 +75,7 @@ export default function Intro() {
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold tracking-tight">Fluxo de Integração</h2>
           <p className="text-muted-foreground">
-            A integração com a API Angar segue um fluxo simples de três etapas:
+            A integração com a API Parcred Brasil segue um fluxo simples de três etapas:
           </p>
           
           <div className="space-y-3">

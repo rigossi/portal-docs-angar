@@ -7,7 +7,7 @@ import { AlertCircle, ArrowRight, Key } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Autenticacao() {
-  const requestExample = `curl -X POST https://api-angar-homologacao.onrender.com/v1/login \\
+  const requestExample = `curl -X POST https://api-parcred-homologacao.onrender.com/v1/login \\
   -H "Content-Type: application/json" \\
   -d '{
     "client_id": "SEU_CLIENT_ID",
@@ -38,7 +38,7 @@ export default function Autenticacao() {
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold tracking-tight">Visão Geral</h2>
           <p className="text-muted-foreground">
-            A API Angar utiliza o padrão <strong>JWT (JSON Web Token)</strong> para autenticação. Todas as requisições aos endpoints protegidos devem incluir um token válido no header <code className="bg-muted px-1.5 py-0.5 rounded">Authorization</code>.
+            A API Parcred Brasil utiliza o padrão <strong>JWT (JSON Web Token)</strong> para autenticação. Todas as requisições aos endpoints protegidos devem incluir um token válido no header <code className="bg-muted px-1.5 py-0.5 rounded">Authorization</code>.
           </p>
         </div>
 
@@ -47,7 +47,7 @@ export default function Autenticacao() {
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Credenciais de Acesso</AlertTitle>
           <AlertDescription>
-            Entre em contato com a equipe Angar para receber suas credenciais (<code>client_id</code> e <code>client_secret</code>). Mantenha essas informações seguras e nunca as exponha em código client-side.
+            Entre em contato com a equipe Parcred Brasil para receber suas credenciais (<code>client_id</code> e <code>client_secret</code>). Mantenha essas informações seguras e nunca as exponha em código client-side.
           </AlertDescription>
         </Alert>
 
