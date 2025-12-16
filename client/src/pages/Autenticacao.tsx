@@ -7,7 +7,7 @@ import { AlertCircle, ArrowRight, Key } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Autenticacao() {
-  const requestExample = `curl -X POST https://api-parcred-homologacao.onrender.com/v1/login \\
+  const requestExample = `curl -X POST https://api-angar-homologacao.onrender.com/v1/login \\
   -H "Content-Type: application/json" \\
   -d '{
     "client_id": "SEU_CLIENT_ID",

@@ -41,7 +41,7 @@ export default function Intro() {
               </CardHeader>
               <CardContent>
                 <CodeBlock
-                  code="https://api-parcred-homologacao.onrender.com"
+                  code="https://api-angar-homologacao.onrender.com"
                   language="url"
                 />
                 <p className="mt-3 text-sm text-muted-foreground">
@@ -60,7 +60,7 @@ export default function Intro() {
               </CardHeader>
               <CardContent>
                 <CodeBlock
-                  code="https://api-parcred-producao.onrender.com"
+                  code="https://api-angar-producao.onrender.com"
                   language="url"
                 />
                 <p className="mt-3 text-sm text-muted-foreground">

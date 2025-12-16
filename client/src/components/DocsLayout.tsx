@@ -36,7 +36,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           </div>
           <div className="ml-auto flex items-center gap-4">
             <Button variant="outline" size="sm" asChild>
-              <a href="https://api-parcred-homologacao.onrender.com/health" target="_blank" rel="noopener noreferrer">
+              <a href="https://api-angar-homologacao.onrender.com/health" target="_blank" rel="noopener noreferrer">
                 Status da API
               </a>
             </Button>

@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { AlertCircle, Book, CheckCircle } from "lucide-react";
 
 export default function GuiaCompleto() {
-  const step1Code = `TOKEN=$(curl -s -X POST https://api-parcred-homologacao.onrender.com/v1/login \\
+  const step1Code = `TOKEN=$(curl -s -X POST https://api-angar-homologacao.onrender.com/v1/login \\
   -H "Content-Type: application/json" \\
   -d '{"client_id":"parceiro_abc_123","client_secret":"dK$!s#@j9sA*d(s@D*j"}' \\
   | jq -r '.access_token')
@@ -14,7 +14,7 @@ echo "Token: $TOKEN"`;
 
   const step2Code = `WEBHOOK_URL="https://webhook.site/sua-url-unica"
 
-RESPONSE=$(curl -s -X POST https://api-parcred-homologacao.onrender.com/v1/propostas \\
+RESPONSE=$(curl -s -X POST https://api-angar-homologacao.onrender.com/v1/propostas \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer $TOKEN" \\
   -d "{
@@ -49,7 +49,7 @@ RESPONSE=$(curl -s -X POST https://api-parcred-homologacao.onrender.com/v1/propo
 PROPOSTA_ID=$(echo "$RESPONSE" | jq -r '.id_proposta_angar')
 echo "Proposta criada com ID: $PROPOSTA_ID"`;
 
-  const step3Code = `curl "https://api-parcred-homologacao.onrender.com/confirmar/$PROPOSTA_ID?acao=aceitar"`;
+  const step3Code = `curl "https://api-angar-homologacao.onrender.com/confirmar/$PROPOSTA_ID?acao=aceitar"`;
 
   return (
     <DocsLayout>
@@ -158,7 +158,7 @@ echo "Proposta criada com ID: $PROPOSTA_ID"`;
           </p>
 
           <CodeBlock
-            code="https://api-parcred-homologacao.onrender.com/confirmar/[PROPOSTA_ID]?acao=aceitar"
+            code="https://api-angar-homologacao.onrender.com/confirmar/[PROPOSTA_ID]?acao=aceitar"
             language="url"
           />
 
@@ -225,7 +225,7 @@ echo "Proposta criada com ID: $PROPOSTA_ID"`;
             Para testar o fluxo de recusa, repita os passos 2 e 3, mas no Passo 3 use:
           </p>
           <CodeBlock
-            code="https://api-parcred-homologacao.onrender.com/confirmar/[PROPOSTA_ID]?acao=recusar"
+            code="https://api-angar-homologacao.onrender.com/confirmar/[PROPOSTA_ID]?acao=recusar"
             language="url"
           />
           <p className="text-muted-foreground">

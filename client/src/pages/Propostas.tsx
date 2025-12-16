@@ -9,7 +9,7 @@ import { Link } from "wouter";
 export default function Propostas() {
   const requestExample = `TOKEN="SEU_TOKEN_DE_ACESSO"
 
-curl -X POST https://api-parcred-homologacao.onrender.com/v1/propostas \\
+curl -X POST https://api-angar-homologacao.onrender.com/v1/propostas \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer $TOKEN" \\
   -d '{
