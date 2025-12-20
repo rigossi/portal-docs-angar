@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Book, Code2, FileText, Home, Webhook } from "lucide-react";
+import { Book, Code2, FileText, Home, Webhook, PlayCircle } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
 interface NavItem {
@@ -15,6 +15,7 @@ const navItems: NavItem[] = [
   { title: "Envio de Propostas", href: "/propostas", icon: Code2 },
   { title: "Webhooks", href: "/webhooks", icon: Webhook },
   { title: "Guia Completo", href: "/guia-completo", icon: Book },
+  { title: "Playground", href: "/playground", icon: PlayCircle },
 ];
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {

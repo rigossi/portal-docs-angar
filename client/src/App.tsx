@@ -9,6 +9,7 @@ import Autenticacao from "./pages/Autenticacao";
 import Propostas from "./pages/Propostas";
 import Webhooks from "./pages/Webhooks";
 import GuiaCompleto from "./pages/GuiaCompleto";
+import Playground from "./pages/Playground";
 
 function Router() {
   return (
@@ -18,6 +19,7 @@ function Router() {
       <Route path="/propostas" component={Propostas} />
       <Route path="/webhooks" component={Webhooks} />
       <Route path="/guia-completo" component={GuiaCompleto} />
+      <Route path="/playground" component={Playground} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
