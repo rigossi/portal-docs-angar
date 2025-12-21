@@ -19,6 +19,7 @@ const ENV_URLS = {
 };
 
 const DEFAULT_PAYLOAD = {
+  "id_proposta_parceiro": "PROP-123456",
   "nome": "João da Silva",
   "cpf": "123.456.789-00",
   "email": "joao.silva@email.com",
