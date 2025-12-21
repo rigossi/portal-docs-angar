@@ -20,13 +20,30 @@ const ENV_URLS = {
 
 const DEFAULT_PAYLOAD = {
   "id_proposta_parceiro": "PROP-123456",
-  "nome": "João da Silva",
-  "cpf": "123.456.789-00",
-  "email": "joao.silva@email.com",
-  "telefone": "11999887766",
-  "valor_solicitado": 5000.00,
-  "parcelas": 12,
-  "data_nascimento": "1990-05-15",
+  "cliente": {
+    "nome": "João da Silva",
+    "cpf": "123.456.789-00",
+    "whatsapp": "5511999887766"
+  },
+  "simulacao": {
+    "valores": {
+      "solicitado": 5000.00,
+      "iof": 150.00,
+      "principal": 5150.00,
+      "parcela": 550.00,
+      "liquido": 5000.00,
+      "bruto": 6600.00
+    },
+    "taxas": {
+      "cet_am": 2.5,
+      "cet_aa": 34.5
+    },
+    "prazos": {
+      "total_parcelas": 12,
+      "primeiro_vencimento": "2025-02-10",
+      "ultimo_vencimento": "2026-01-10"
+    }
+  },
   "webhook_url": "https://seu-sistema.com.br/webhook/parcred"
 };
 
