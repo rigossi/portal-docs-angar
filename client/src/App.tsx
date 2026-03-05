@@ -12,6 +12,7 @@ import Changelog from "./pages/Changelog";
 import GuiaCompleto from "./pages/GuiaCompleto";
 import Playground from "./pages/Playground";
 import StatusPage from "./pages/StatusPage";
+import WhatsappSender from "./pages/WhatsappSender";
 
 function Router() {
   return (
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/changelog" component={Changelog} />
       <Route path="/guia-completo" component={GuiaCompleto} />
       <Route path="/playground" component={Playground} />
+      <Route path="/whatsapp-sender" component={WhatsappSender} />
       <Route path="/status" component={StatusPage} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />

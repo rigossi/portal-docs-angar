@@ -1,97 +1,144 @@
-import DocsLayout from "@/components/DocsLayout";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, CheckCircle, PlayCircle, Send, MessageSquare } from "lucide-react";
 import { useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Loader2, CheckCircle2, XCircle, Play, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import DocsLayout from "@/components/DocsLayout";
+
+type Environment = "homologacao" | "producao";
+
+const ENV_URLS = {
+  homologacao: "https://api-angar-homologacao.onrender.com",
+  producao: "https://api-angar-producao.onrender.com"
+};
+
+const DEFAULT_PAYLOAD = {
+  "id_proposta_parceiro": "PROP-123456",
+  "cliente": {
+    "nome": "João da Silva",
+    "cpf": "123.456.789-00",
+    "whatsapp": "5511999887766"
+  },
+  "simulacao": {
+    "valores": {
+      "solicitado": 5000.00,
+      "iof": 150.00,
+      "principal": 5150.00,
+      "parcela": 550.00,
+      "liquido": 5000.00,
+      "bruto": 6600.00
+    },
+    "taxas": {
+      "cet_am": 2.5,
+      "cet_aa": 34.5
+    },
+    "prazos": {
+      "total_parcelas": 12,
+      "primeiro_vencimento": "2025-02-10",
+      "ultimo_vencimento": "2026-01-10"
+    }
+  },
+  "webhook_url": "https://seu-sistema.com.br/webhook/parcred"
+};
 
 export default function Playground() {
-  const [environment, setEnvironment] = useState("homologacao");
+  const [env, setEnv] = useState<Environment>("homologacao");
+  const [clientId, setClientId] = useState("");
+  const [clientSecret, setClientSecret] = useState("");
   const [token, setToken] = useState("");
+  const [payload, setPayload] = useState(JSON.stringify(DEFAULT_PAYLOAD, null, 2));
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [logs, setLogs] = useState<Array<{ type: "req" | "res" | "err", content: any, timestamp: string }>>([]);
 
-  const [formData, setFormData] = useState({
-    nome: "",
-    whatsapp: "",
-    valor: "",
-    parcelas: "",
-  });
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const addLog = (type: "req" | "res" | "err", content: any) => {
+    setLogs(prev => [{
+      type,
+      content,
+      timestamp: new Date().toLocaleTimeString()
+    }, ...prev]);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setResult(null);
-    setError(null);
+  const handleLogin = async () => {
+    if (!clientId || !clientSecret) {
+      toast.error("Preencha Client ID e Client Secret");
+      return;
+    }
 
-    const baseUrl = environment === "producao" 
-      ? "https://api-angar-producao.onrender.com" 
-      : "https://api-angar-homologacao.onrender.com";
+    setLoading(true);
+    const url = `${ENV_URLS[env]}/v1/login`;
 
     try {
-      // 1. Validar Token
-      if (!token) {
-        throw new Error("Por favor, insira um Token de API válido.");
-      }
-
-      // 2. Montar Payload da Proposta
-      const payload = {
-        id_proposta_parceiro: `TESTE-${Date.now()}`,
-        cliente: {
-          nome: formData.nome,
-          cpf: "000.000.000-00", // CPF fictício para teste
-          whatsapp: formData.whatsapp.replace(/\D/g, ""), // Remove formatação
-        },
-        simulacao: {
-          valores: {
-            solicitado: parseFloat(formData.valor),
-            iof: 0,
-            principal: parseFloat(formData.valor),
-            parcela: parseFloat(formData.valor) / parseInt(formData.parcelas),
-            liquido: parseFloat(formData.valor),
-            bruto: parseFloat(formData.valor),
-          },
-          taxas: {
-            cet_am: 1.5,
-            cet_aa: 19.56,
-          },
-          prazos: {
-            total_parcelas: parseInt(formData.parcelas),
-            primeiro_vencimento: new Date().toISOString().split('T')[0],
-            ultimo_vencimento: new Date().toISOString().split('T')[0],
-          },
-        },
-        webhook_url: "https://webhook.site/seu-webhook-teste", // Webhook fictício
-      };
-
-      // 3. Enviar Requisição
-      const response = await fetch(`${baseUrl}/v1/propostas`, {
+      addLog("req", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
+        url,
+        body: { client_id: clientId, client_secret: "******" }
+      });
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ client_id: clientId, client_secret: clientSecret })
       });
 
       const data = await response.json();
+      addLog(response.ok ? "res" : "err", data);
 
-      if (!response.ok) {
-        throw new Error(data.message || "Erro ao enviar proposta.");
+      if (response.ok && data.access_token) {
+        setToken(data.access_token);
+        toast.success("Autenticado com sucesso!");
+      } else {
+        toast.error("Falha na autenticação");
       }
+    } catch (error) {
+      addLog("err", { message: "Erro de conexão", error });
+      toast.error("Erro ao conectar com a API");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      setResult(data);
-    } catch (err: any) {
-      setError(err.message);
+  const handleSendProposal = async () => {
+    if (!token) {
+      toast.error("Você precisa se autenticar primeiro");
+      return;
+    }
+
+    try {
+      const body = JSON.parse(payload);
+      setLoading(true);
+      const url = `${ENV_URLS[env]}/v1/propostas`;
+
+      addLog("req", {
+        method: "POST",
+        url,
+        headers: { Authorization: "Bearer " + token.substring(0, 10) + "..." },
+        body
+      });
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(body)
+      });
+
+      const data = await response.json();
+      addLog(response.ok ? "res" : "err", data);
+
+      if (response.ok) {
+        toast.success("Proposta enviada com sucesso!");
+      } else {
+        toast.error("Erro ao enviar proposta");
+      }
+    } catch (error) {
+      toast.error("JSON inválido ou erro de conexão");
+      addLog("err", { message: "Erro ao processar requisição", error });
     } finally {
       setLoading(false);
     }
@@ -99,173 +146,165 @@ export default function Playground() {
 
   return (
     <DocsLayout>
-      <div className="space-y-8">
-        {/* Header */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <PlayCircle className="h-8 w-8 text-primary" />
-            <h1 className="text-4xl font-bold tracking-tight">Playground WhatsApp</h1>
+      <div className="space-y-6 max-w-6xl mx-auto pb-20">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Playground da API</h1>
+            <p className="text-muted-foreground mt-2">
+              Teste a integração em tempo real diretamente pelo navegador.
+            </p>
           </div>
-          <p className="text-xl text-muted-foreground">
-            Teste o envio de mensagens WhatsApp em tempo real. Preencha os dados abaixo e dispare uma proposta teste.
-          </p>
+          <div className="flex items-center gap-2 bg-card border p-2 rounded-lg shadow-sm">
+            <Label className="text-sm font-medium px-2">Ambiente:</Label>
+            <Select value={env} onValueChange={(v) => setEnv(v as Environment)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="homologacao">🚧 Homologação</SelectItem>
+                <SelectItem value="producao">🚀 Produção</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-2">
-          {/* Formulário */}
-          <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Coluna da Esquerda: Controles */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Card de Autenticação */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5 text-primary" />
-                  Simulador de Envio
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <div className={`w-3 h-3 rounded-full ${token ? "bg-green-500" : "bg-red-500"}`} />
+                  1. Autenticação
                 </CardTitle>
-                <CardDescription>Preencha os dados para simular um envio real.</CardDescription>
+                <CardDescription>Obtenha seu token de acesso</CardDescription>
               </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="environment">Ambiente</Label>
-                    <Select value={environment} onValueChange={setEnvironment}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o ambiente" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="homologacao">Homologação (Teste)</SelectItem>
-                        <SelectItem value="producao">Produção (Real)</SelectItem>
-                      </SelectContent>
-                    </Select>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Client ID</Label>
+                  <Input 
+                    placeholder="Ex: parceiro_abc_123" 
+                    value={clientId}
+                    onChange={(e) => setClientId(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Client Secret</Label>
+                  <Input 
+                    type="password" 
+                    placeholder="••••••••••••••••" 
+                    value={clientSecret}
+                    onChange={(e) => setClientSecret(e.target.value)}
+                  />
+                </div>
+                <Button 
+                  className="w-full" 
+                  onClick={handleLogin} 
+                  disabled={loading || !!token}
+                  variant={token ? "outline" : "default"}
+                >
+                  {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                  {token ? "Autenticado" : "Gerar Token"}
+                </Button>
+                
+                {token && (
+                  <div className="p-3 bg-muted rounded-md text-xs break-all relative group">
+                    <span className="font-mono text-muted-foreground">Token: {token.substring(0, 30)}...</span>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-6 w-6 absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => {
+                        setToken("");
+                        toast.info("Token removido");
+                      }}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
                   </div>
+                )}
+              </CardContent>
+            </Card>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="token">Token de Acesso (Bearer)</Label>
-                    <Input 
-                      id="token" 
-                      type="password" 
-                      placeholder="Cole seu token JWT aqui..." 
-                      value={token}
-                      onChange={(e) => setToken(e.target.value)}
-                      required
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Obtenha um token na rota <code>/v1/login</code> antes de testar.
-                    </p>
+            {/* Card de Envio */}
+            <Card className={!token ? "opacity-50 pointer-events-none" : ""}>
+              <CardHeader>
+                <CardTitle className="text-lg">2. Enviar Proposta</CardTitle>
+                <CardDescription>Simule uma nova solicitação</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <Label>Payload JSON</Label>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-6 text-xs"
+                      onClick={() => setPayload(JSON.stringify(DEFAULT_PAYLOAD, null, 2))}
+                    >
+                      Resetar
+                    </Button>
                   </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="nome">Nome do Cliente</Label>
-                      <Input 
-                        id="nome" 
-                        name="nome" 
-                        placeholder="Ex: João Silva" 
-                        value={formData.nome}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="whatsapp">WhatsApp (com DDI)</Label>
-                      <Input 
-                        id="whatsapp" 
-                        name="whatsapp" 
-                        placeholder="Ex: 5511999998888" 
-                        value={formData.whatsapp}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="valor">Valor Solicitado (R$)</Label>
-                      <Input 
-                        id="valor" 
-                        name="valor" 
-                        type="number" 
-                        placeholder="Ex: 5000" 
-                        value={formData.valor}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="parcelas">Qtd. Parcelas</Label>
-                      <Input 
-                        id="parcelas" 
-                        name="parcelas" 
-                        type="number" 
-                        placeholder="Ex: 12" 
-                        value={formData.parcelas}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? (
-                      <>Enviando...</>
-                    ) : (
-                      <>
-                        <Send className="mr-2 h-4 w-4" />
-                        Enviar Mensagem Teste
-                      </>
-                    )}
-                  </Button>
-
-                </form>
+                  <Textarea 
+                    className="font-mono text-xs h-[300px]" 
+                    value={payload}
+                    onChange={(e) => setPayload(e.target.value)}
+                  />
+                </div>
+                <Button className="w-full" onClick={handleSendProposal} disabled={loading}>
+                  {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4" />}
+                  Enviar Requisição
+                </Button>
               </CardContent>
             </Card>
           </div>
 
-          {/* Resultado */}
-          <div className="space-y-6">
+          {/* Coluna da Direita: Logs e Resultados */}
+          <div className="lg:col-span-2">
             <Card className="h-full flex flex-col">
-              <CardHeader>
-                <CardTitle>Resultado da Requisição</CardTitle>
-                <CardDescription>A resposta da API aparecerá aqui.</CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <div>
+                  <CardTitle>Console de Execução</CardTitle>
+                  <CardDescription>Histórico de requisições e respostas</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => setLogs([])}>
+                  Limpar Logs
+                </Button>
               </CardHeader>
-              <CardContent className="flex-1">
-                {error && (
-                  <Alert variant="destructive" className="mb-4">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Erro</AlertTitle>
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
-
-                {result && (
-                  <div className="space-y-4">
-                    <Alert className="bg-green-50 border-green-200 text-green-800">
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                      <AlertTitle>Sucesso!</AlertTitle>
-                      <AlertDescription>
-                        A proposta foi criada e a mensagem enviada para o WhatsApp.
-                      </AlertDescription>
-                    </Alert>
-                    
-                    <div className="rounded-md bg-muted p-4 overflow-auto max-h-[400px]">
-                      <pre className="text-xs font-mono">
-                        {JSON.stringify(result, null, 2)}
-                      </pre>
+              <CardContent className="flex-1 overflow-hidden flex flex-col">
+                <div className="flex-1 overflow-y-auto space-y-4 pr-2 max-h-[800px]">
+                  {logs.length === 0 && (
+                    <div className="text-center text-muted-foreground py-20">
+                      <div className="flex justify-center mb-4">
+                        <Play className="h-12 w-12 opacity-20" />
+                      </div>
+                      <p>Nenhuma requisição realizada ainda.</p>
+                      <p className="text-sm">Autentique-se e envie uma proposta para ver os logs aqui.</p>
                     </div>
-                  </div>
-                )}
-
-                {!result && !error && (
-                  <div className="h-full flex flex-col items-center justify-center text-muted-foreground text-sm italic space-y-4">
-                    <div className="p-4 bg-muted rounded-full">
-                      <Send className="h-8 w-8 opacity-20" />
+                  )}
+                  
+                  {logs.map((log, i) => (
+                    <div key={i} className="border rounded-lg overflow-hidden text-sm">
+                      <div className={`px-4 py-2 flex items-center justify-between ${
+                        log.type === "req" ? "bg-blue-500/10 text-blue-700 dark:text-blue-300" :
+                        log.type === "res" ? "bg-green-500/10 text-green-700 dark:text-green-300" :
+                        "bg-red-500/10 text-red-700 dark:text-red-300"
+                      }`}>
+                        <div className="flex items-center gap-2 font-medium">
+                          {log.type === "req" ? <Play className="h-4 w-4" /> :
+                           log.type === "res" ? <CheckCircle2 className="h-4 w-4" /> :
+                           <XCircle className="h-4 w-4" />}
+                          {log.type === "req" ? "REQUEST" : log.type === "res" ? "RESPONSE" : "ERROR"}
+                        </div>
+                        <span className="text-xs opacity-70">{log.timestamp}</span>
+                      </div>
+                      <div className="p-4 bg-muted/30 font-mono text-xs overflow-x-auto">
+                        <pre>{JSON.stringify(log.content, null, 2)}</pre>
+                      </div>
                     </div>
-                    <p>Aguardando envio...</p>
-                    <p className="text-xs max-w-[250px] text-center">
-                      Preencha o formulário ao lado e clique em enviar para testar a integração.
-                    </p>
-                  </div>
-                )}
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </div>
