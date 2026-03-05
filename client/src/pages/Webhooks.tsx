@@ -8,7 +8,7 @@ import { Link } from "wouter";
 
 export default function Webhooks() {
   const payloadExample = `{
-  "id_proposta_angar": "ANG-d250f450-c920-44fc-ad2b-d4d17e94b5bc",
+  "id_proposta_parcred": "PAR-d250f450-c920-44fc-ad2b-d4d17e94b5bc",
   "id_proposta_parceiro": "PROP-XYZ-98765",
   "status": "ACEITO",
   "timestamp": "2025-12-12T21:58:36.846Z",
@@ -17,11 +17,11 @@ export default function Webhooks() {
 
   const validationExample = `const crypto = require("crypto");
 
-function validarAssinatura(req, keyAngar) {
+function validarAssinatura(req, secretKey) {
   // 1. Extrair a assinatura recebida do header
-  const assinaturaRecebida = req.headers["x-angar-signature"];
+  const assinaturaRecebida = req.headers["x-parcred-signature"];
   if (!assinaturaRecebida) {
-    throw new Error("Header x-angar-signature ausente.");
+    throw new Error("Header x-parcred-signature ausente.");
   }
 
   // 2. Obter o corpo cru (raw body) da requisição
@@ -29,7 +29,7 @@ function validarAssinatura(req, keyAngar) {
 
   // 3. Calcular a assinatura esperada
   const assinaturaCalculada = crypto
-    .createHmac("sha256", keyAngar)
+    .createHmac("sha256", secretKey)
     .update(corpoCru)
     .digest("hex");
 
@@ -52,12 +52,12 @@ const crypto = require("crypto");
 const app = express();
 app.use(express.json());
 
-const KEY_ANGAR_SECRETA = process.env.KEY_ANGAR_SECRETA;
+const SECRET_KEY = process.env.SECRET_KEY;
 
-app.post("/webhook/angar", (req, res) => {
+app.post("/webhook/parcred", (req, res) => {
   try {
     // 1. Validar a assinatura
-    validarAssinatura(req, KEY_ANGAR_SECRETA);
+    validarAssinatura(req, SECRET_KEY);
 
     // 2. Processar os dados
     const { id_proposta_parceiro, status } = req.body;
@@ -80,7 +80,7 @@ app.post("/webhook/angar", (req, res) => {
   }
 });
 
-function validarAssinatura(req, keyAngar) { /* ... */ }
+function validarAssinatura(req, secretKey) { /* ... */ }
 
 app.listen(3000, () => {
   console.log("Servidor de webhook rodando na porta 3000");
@@ -154,7 +154,7 @@ app.listen(3000, () => {
                 </TableHeader>
                 <TableBody>
                   <TableRow>
-                    <TableCell className="font-mono">id_proposta_angar</TableCell>
+                     <TableCell className="font-mono">id_proposta_parcred</TableCell>
                     <TableCell>String</TableCell>
                     <TableCell>ID da proposta no sistema Parcred Brasil</TableCell>
                   </TableRow>
@@ -195,12 +195,12 @@ app.listen(3000, () => {
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Validação Obrigatória</AlertTitle>
             <AlertDescription>
-              Para garantir que a requisição veio da Parcred Brasil, cada webhook é assinado usando <strong>HMAC-SHA256</strong>. A assinatura é enviada no header <code>x-angar-signature</code>. É fundamental que você valide esta assinatura antes de processar o webhook.
+              Para garantir que a requisição veio da Parcred Brasil, cada webhook é assinado usando <strong>HMAC-SHA256</strong>. A assinatura é enviada no header <code>x-parcred-signature</code>. É fundamental que você valide esta assinatura antes de processar o webhook.
             </AlertDescription>
           </Alert>
 
           <p className="text-muted-foreground">
-            A chave secreta (<code className="bg-muted px-1.5 py-0.5 rounded">KEY_ANGAR</code>) será fornecida pela equipe Parcred Brasil. Mantenha-a segura e nunca a exponha publicamente.
+            A chave secreta (<code className="bg-muted px-1.5 py-0.5 rounded">SECRET_KEY</code>) será fornecida pela equipe Parcred Brasil. Mantenha-a segura e nunca a exponha publicamente.
           </p>
 
           <CodeBlock code={validationExample} language="javascript" title="Função de Validação (Node.js)" />
