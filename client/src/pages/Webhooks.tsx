@@ -104,8 +104,12 @@ app.listen(3000, () => {
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold tracking-tight">Visão Geral</h2>
           <p className="text-muted-foreground">
-            Quando o cliente final interagir com a proposta (aceitando ou recusando), a API Parcred Brasil enviará uma notificação POST para a URL de webhook que você informou ao criar a proposta.
+            A API Parcred Brasil utiliza webhooks para notificar seu sistema sobre eventos importantes em tempo real. Existem dois tipos de notificações:
           </p>
+          <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+            <li><strong>Status da Proposta:</strong> Quando o cliente aceita ou recusa a proposta.</li>
+            <li><strong>Status do WhatsApp:</strong> Atualizações de entrega e leitura das mensagens enviadas (opcional).</li>
+          </ul>
         </div>
 
         {/* Implementation */}

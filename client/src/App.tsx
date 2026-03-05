@@ -8,6 +8,7 @@ import Intro from "./pages/Intro";
 import Autenticacao from "./pages/Autenticacao";
 import Propostas from "./pages/Propostas";
 import Webhooks from "./pages/Webhooks";
+import Changelog from "./pages/Changelog";
 import GuiaCompleto from "./pages/GuiaCompleto";
 import Playground from "./pages/Playground";
 
@@ -18,6 +19,7 @@ function Router() {
       <Route path="/autenticacao" component={Autenticacao} />
       <Route path="/propostas" component={Propostas} />
       <Route path="/webhooks" component={Webhooks} />
+      <Route path="/changelog" component={Changelog} />
       <Route path="/guia-completo" component={GuiaCompleto} />
       <Route path="/playground" component={Playground} />
       <Route path="/404" component={NotFound} />

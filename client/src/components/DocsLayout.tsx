@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Book, Code2, FileText, Home, Webhook, PlayCircle } from "lucide-react";
+import { Book, Code2, FileText, History, Home, Webhook, PlayCircle } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
 interface NavItem {
@@ -14,6 +14,7 @@ const navItems: NavItem[] = [
   { title: "Autenticação", href: "/autenticacao", icon: FileText },
   { title: "Envio de Propostas", href: "/propostas", icon: Code2 },
   { title: "Webhooks", href: "/webhooks", icon: Webhook },
+  { title: "Notas de Versão", href: "/changelog", icon: History },
   { title: "Guia Completo", href: "/guia-completo", icon: Book },
   { title: "Playground", href: "/playground", icon: PlayCircle },
 ];
@@ -84,7 +85,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
             © 2025 Parcred Brasil. Todos os direitos reservados.
           </p>
           <p className="text-center text-sm text-muted-foreground">
-            Versão 1.0.0
+            Versão 1.1.0
           </p>
         </div>
       </footer>
