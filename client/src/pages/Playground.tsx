@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, CheckCircle2, XCircle, Play, Trash2 } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, Play, Trash2, Copy } from "lucide-react";
 import { toast } from "sonner";
 import DocsLayout from "@/components/DocsLayout";
 
@@ -210,18 +210,35 @@ export default function Playground() {
                 
                 {token && (
                   <div className="p-3 bg-muted rounded-md text-xs break-all relative group">
-                    <span className="font-mono text-muted-foreground">Token: {token.substring(0, 30)}...</span>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-6 w-6 absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() => {
-                        setToken("");
-                        toast.info("Token removido");
-                      }}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
+                    <div className="flex justify-between items-start gap-2">
+                      <span className="font-mono text-muted-foreground flex-1">{token}</span>
+                      <div className="flex gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6"
+                          onClick={() => {
+                            navigator.clipboard.writeText(token);
+                            toast.success("Token copiado!");
+                          }}
+                          title="Copiar Token"
+                        >
+                          <Copy className="h-3 w-3" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6 text-destructive hover:text-destructive"
+                          onClick={() => {
+                            setToken("");
+                            toast.info("Token removido");
+                          }}
+                          title="Remover Token"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </CardContent>

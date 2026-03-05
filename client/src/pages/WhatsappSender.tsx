@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, CheckCircle, MessageSquare, Send, Key, ExternalLink } from "lucide-react";
+import { AlertCircle, CheckCircle, MessageSquare, Send, Key, ExternalLink, Terminal, ArrowRight, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
 
@@ -15,6 +15,15 @@ export default function WhatsappSender() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [logs, setLogs] = useState<Array<{ type: "req" | "res" | "err", content: any, timestamp: string }>>([]);
+
+  const addLog = (type: "req" | "res" | "err", content: any) => {
+    setLogs(prev => [{
+      type,
+      content,
+      timestamp: new Date().toLocaleTimeString()
+    }, ...prev]);
+  };
 
   const [formData, setFormData] = useState({
     nome: "",
@@ -33,6 +42,7 @@ export default function WhatsappSender() {
     setLoading(true);
     setResult(null);
     setError(null);
+    setLogs([]); // Limpar logs anteriores
 
     const baseUrl = environment === "producao" 
       ? "https://api-angar-producao.onrender.com" 
@@ -74,6 +84,13 @@ export default function WhatsappSender() {
         webhook_url: "https://webhook.site/seu-webhook-teste", // Webhook fictício
       };
 
+      addLog("req", {
+        method: "POST",
+        url: `${baseUrl}/v1/propostas`,
+        headers: { Authorization: "Bearer " + token.substring(0, 10) + "..." },
+        body: payload
+      });
+
       // 3. Enviar Requisição
       const response = await fetch(`${baseUrl}/v1/propostas`, {
         method: "POST",
@@ -85,6 +102,7 @@ export default function WhatsappSender() {
       });
 
       const data = await response.json();
+      addLog(response.ok ? "res" : "err", data);
 
       if (!response.ok) {
         throw new Error(data.message || "Erro ao enviar proposta.");
@@ -93,6 +111,9 @@ export default function WhatsappSender() {
       setResult(data);
     } catch (err: any) {
       setError(err.message);
+      if (!logs.find(l => l.type === "err")) {
+        addLog("err", { message: err.message });
+      }
     } finally {
       setLoading(false);
     }
@@ -230,51 +251,51 @@ export default function WhatsappSender() {
             </Card>
           </div>
 
-          {/* Resultado */}
+          {/* Console de Logs */}
           <div className="space-y-6">
             <Card className="h-full flex flex-col">
               <CardHeader>
-                <CardTitle>Resultado da Requisição</CardTitle>
-                <CardDescription>A resposta da API aparecerá aqui.</CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <Terminal className="h-5 w-5 text-primary" />
+                  Console de Execução
+                </CardTitle>
+                <CardDescription>Acompanhe o payload enviado e a resposta da API.</CardDescription>
               </CardHeader>
-              <CardContent className="flex-1">
-                {error && (
-                  <Alert variant="destructive" className="mb-4">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Erro</AlertTitle>
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
-
-                {result && (
-                  <div className="space-y-4">
-                    <Alert className="bg-green-50 border-green-200 text-green-800">
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                      <AlertTitle>Sucesso!</AlertTitle>
-                      <AlertDescription>
-                        A proposta foi criada e a mensagem enviada para o WhatsApp.
-                      </AlertDescription>
-                    </Alert>
-                    
-                    <div className="rounded-md bg-muted p-4 overflow-auto max-h-[400px]">
-                      <pre className="text-xs font-mono">
-                        {JSON.stringify(result, null, 2)}
-                      </pre>
+              <CardContent className="flex-1 overflow-hidden flex flex-col">
+                <div className="flex-1 overflow-y-auto space-y-4 pr-2 max-h-[800px]">
+                  {logs.length === 0 && (
+                    <div className="text-center text-muted-foreground py-20">
+                      <div className="flex justify-center mb-4">
+                        <Send className="h-12 w-12 opacity-20" />
+                      </div>
+                      <p>Aguardando envio...</p>
+                      <p className="text-sm max-w-[250px] mx-auto">
+                        Preencha o formulário ao lado e clique em enviar para ver os detalhes da requisição aqui.
+                      </p>
                     </div>
-                  </div>
-                )}
-
-                {!result && !error && (
-                  <div className="h-full flex flex-col items-center justify-center text-muted-foreground text-sm italic space-y-4">
-                    <div className="p-4 bg-muted rounded-full">
-                      <Send className="h-8 w-8 opacity-20" />
+                  )}
+                  
+                  {logs.map((log, i) => (
+                    <div key={i} className="border rounded-lg overflow-hidden text-sm shadow-sm">
+                      <div className={`px-4 py-2 flex items-center justify-between ${
+                        log.type === "req" ? "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-b border-blue-200 dark:border-blue-800" :
+                        log.type === "res" ? "bg-green-500/10 text-green-700 dark:text-green-300 border-b border-green-200 dark:border-green-800" :
+                        "bg-red-500/10 text-red-700 dark:text-red-300 border-b border-red-200 dark:border-red-800"
+                      }`}>
+                        <div className="flex items-center gap-2 font-medium">
+                          {log.type === "req" ? <ArrowRight className="h-4 w-4" /> :
+                           log.type === "res" ? <ArrowLeft className="h-4 w-4" /> :
+                           <AlertCircle className="h-4 w-4" />}
+                          {log.type === "req" ? "REQUEST (Enviado)" : log.type === "res" ? "RESPONSE (Recebido)" : "ERROR"}
+                        </div>
+                        <span className="text-xs opacity-70 font-mono">{log.timestamp}</span>
+                      </div>
+                      <div className="p-4 bg-muted/30 font-mono text-xs overflow-x-auto">
+                        <pre>{JSON.stringify(log.content, null, 2)}</pre>
+                      </div>
                     </div>
-                    <p>Aguardando envio...</p>
-                    <p className="text-xs max-w-[250px] text-center">
-                      Preencha o formulário ao lado e clique em enviar para testar a integração.
-                    </p>
-                  </div>
-                )}
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </div>
