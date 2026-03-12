@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, CheckCircle, MessageSquare, Send, Key, ExternalLink, Terminal, ArrowRight, ArrowLeft } from "lucide-react";
+import { AlertCircle, CheckCircle, MessageSquare, Send, Key, ExternalLink, Terminal, ArrowRight, ArrowLeft, Copy } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
+import { toast } from "sonner";
 
 export default function WhatsappSender() {
   const [environment, setEnvironment] = useState("homologacao");
@@ -30,11 +31,36 @@ export default function WhatsappSender() {
     whatsapp: "",
     valor: "",
     parcelas: "",
+    taxa: "1.5", // Valor padrão
+    valor_parcela: "", // Calculado ou inserido
+    valor_bruto: "" // Calculado ou inserido
   });
+
+  // Atualiza valor da parcela e bruto automaticamente quando valor/parcelas mudam (estimativa simples)
+  const updateCalculatedFields = (name: string, value: string) => {
+    const newFormData = { ...formData, [name]: value };
+    
+    if (name === "valor" || name === "parcelas" || name === "taxa") {
+      const valor = parseFloat(newFormData.valor) || 0;
+      const parcelas = parseInt(newFormData.parcelas) || 0;
+      const taxa = parseFloat(newFormData.taxa) || 0;
+
+      if (valor > 0 && parcelas > 0) {
+        // Cálculo simples de juros compostos para estimativa
+        const montante = valor * Math.pow(1 + (taxa / 100), parcelas);
+        const parcela = montante / parcelas;
+        
+        newFormData.valor_bruto = montante.toFixed(2);
+        newFormData.valor_parcela = parcela.toFixed(2);
+      }
+    }
+    
+    setFormData(newFormData);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    updateCalculatedFields(name, value);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -67,13 +93,13 @@ export default function WhatsappSender() {
             solicitado: parseFloat(formData.valor),
             iof: 0,
             principal: parseFloat(formData.valor),
-            parcela: parseFloat(formData.valor) / parseInt(formData.parcelas),
+            parcela: parseFloat(formData.valor_parcela),
             liquido: parseFloat(formData.valor),
-            bruto: parseFloat(formData.valor),
+            bruto: parseFloat(formData.valor_bruto),
           },
           taxas: {
-            cet_am: 1.5,
-            cet_aa: 19.56,
+            cet_am: parseFloat(formData.taxa),
+            cet_aa: parseFloat(formData.taxa) * 12, // Estimativa simples
           },
           prazos: {
             total_parcelas: parseInt(formData.parcelas),
@@ -109,11 +135,13 @@ export default function WhatsappSender() {
       }
 
       setResult(data);
+      toast.success("Mensagem enviada com sucesso!");
     } catch (err: any) {
       setError(err.message);
       if (!logs.find(l => l.type === "err")) {
         addLog("err", { message: err.message });
       }
+      toast.error("Erro ao enviar mensagem.");
     } finally {
       setLoading(false);
     }
@@ -229,6 +257,48 @@ export default function WhatsappSender() {
                         type="number" 
                         placeholder="Ex: 12" 
                         value={formData.parcelas}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="taxa">Taxa a.m. (%)</Label>
+                      <Input 
+                        id="taxa" 
+                        name="taxa" 
+                        type="number" 
+                        step="0.01"
+                        placeholder="Ex: 1.5" 
+                        value={formData.taxa}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="valor_parcela">Valor Parcela (R$)</Label>
+                      <Input 
+                        id="valor_parcela" 
+                        name="valor_parcela" 
+                        type="number" 
+                        step="0.01"
+                        placeholder="Ex: 500.00" 
+                        value={formData.valor_parcela}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="valor_bruto">Valor Bruto (R$)</Label>
+                      <Input 
+                        id="valor_bruto" 
+                        name="valor_bruto" 
+                        type="number" 
+                        step="0.01"
+                        placeholder="Ex: 6000.00" 
+                        value={formData.valor_bruto}
                         onChange={handleInputChange}
                         required
                       />
