@@ -35,8 +35,7 @@ export default function WhatsappSender() {
     parcelas: "",
     taxa_nominal: "1.64",
     iof: "0",
-    valor_parcela: "",
-    valor_bruto: ""
+    valor_parcela: ""
   });
 
   // Atualiza valor da parcela e bruto automaticamente quando valor/parcelas mudam (estimativa simples)
@@ -55,7 +54,6 @@ export default function WhatsappSender() {
         const montante = principal * Math.pow(1 + (taxa / 100), parcelas);
         const parcela = montante / parcelas;
         
-        newFormData.valor_bruto = montante.toFixed(2);
         newFormData.valor_parcela = parcela.toFixed(2);
       }
     }
@@ -101,7 +99,7 @@ export default function WhatsappSender() {
             principal: parseFloat(formData.valor) + parseFloat(formData.iof),
             parcela: parseFloat(formData.valor_parcela),
             liquido: parseFloat(formData.valor),
-            bruto: parseFloat(formData.valor_bruto),
+            bruto: parseFloat(formData.valor_parcela) * parseInt(formData.parcelas),
           },
           taxas: {
             nominal_am: parseFloat(formData.taxa_nominal),
@@ -309,7 +307,7 @@ export default function WhatsappSender() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="taxa_nominal">Taxa Nominal (%)</Label>
                       <Input 
@@ -332,19 +330,6 @@ export default function WhatsappSender() {
                         step="0.01"
                         placeholder="Ex: 500.00" 
                         value={formData.valor_parcela}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="valor_bruto">Valor Bruto (R$)</Label>
-                      <Input 
-                        id="valor_bruto" 
-                        name="valor_bruto" 
-                        type="number" 
-                        step="0.01"
-                        placeholder="Ex: 6000.00" 
-                        value={formData.valor_bruto}
                         onChange={handleInputChange}
                         required
                       />
