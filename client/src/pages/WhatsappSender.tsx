@@ -29,25 +29,30 @@ export default function WhatsappSender() {
   const [formData, setFormData] = useState({
     nome: "",
     whatsapp: "",
+    data_solicitacao: new Date().toISOString().split('T')[0],
     valor: "",
+    data_liberacao: new Date(Date.now() + 86400000).toISOString().split('T')[0],
     parcelas: "",
-    taxa: "1.5", // Valor padrão
-    valor_parcela: "", // Calculado ou inserido
-    valor_bruto: "" // Calculado ou inserido
+    taxa_nominal: "1.64",
+    iof: "0",
+    valor_parcela: "",
+    valor_bruto: ""
   });
 
   // Atualiza valor da parcela e bruto automaticamente quando valor/parcelas mudam (estimativa simples)
   const updateCalculatedFields = (name: string, value: string) => {
     const newFormData = { ...formData, [name]: value };
     
-    if (name === "valor" || name === "parcelas" || name === "taxa") {
+    if (name === "valor" || name === "parcelas" || name === "taxa_nominal" || name === "iof") {
       const valor = parseFloat(newFormData.valor) || 0;
       const parcelas = parseInt(newFormData.parcelas) || 0;
-      const taxa = parseFloat(newFormData.taxa) || 0;
+      const taxa = parseFloat(newFormData.taxa_nominal) || 0;
+      const iof = parseFloat(newFormData.iof) || 0;
 
       if (valor > 0 && parcelas > 0) {
         // Cálculo simples de juros compostos para estimativa
-        const montante = valor * Math.pow(1 + (taxa / 100), parcelas);
+        const principal = valor + iof;
+        const montante = principal * Math.pow(1 + (taxa / 100), parcelas);
         const parcela = montante / parcelas;
         
         newFormData.valor_bruto = montante.toFixed(2);
@@ -83,6 +88,7 @@ export default function WhatsappSender() {
       // 2. Montar Payload da Proposta
       const payload = {
         id_proposta_parceiro: `TESTE-${Date.now()}`,
+        data_solicitacao: formData.data_solicitacao,
         cliente: {
           nome: formData.nome,
           cpf: "000.000.000-00", // CPF fictício para teste
@@ -91,20 +97,22 @@ export default function WhatsappSender() {
         simulacao: {
           valores: {
             solicitado: parseFloat(formData.valor),
-            iof: 0,
-            principal: parseFloat(formData.valor),
+            iof: parseFloat(formData.iof),
+            principal: parseFloat(formData.valor) + parseFloat(formData.iof),
             parcela: parseFloat(formData.valor_parcela),
             liquido: parseFloat(formData.valor),
             bruto: parseFloat(formData.valor_bruto),
           },
           taxas: {
-            cet_am: parseFloat(formData.taxa),
-            cet_aa: parseFloat(formData.taxa) * 12, // Estimativa simples
+            nominal_am: parseFloat(formData.taxa_nominal),
+            cet_am: parseFloat(formData.taxa_nominal) * 1.1, // Estimativa
+            cet_aa: parseFloat(formData.taxa_nominal) * 12 * 1.1, // Estimativa
           },
           prazos: {
             total_parcelas: parseInt(formData.parcelas),
-            primeiro_vencimento: new Date().toISOString().split('T')[0],
-            ultimo_vencimento: new Date().toISOString().split('T')[0],
+            data_liberacao_estimada: formData.data_liberacao,
+            primeiro_vencimento: new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0],
+            ultimo_vencimento: new Date(Date.now() + 30 * parseInt(formData.parcelas) * 86400000).toISOString().split('T')[0],
           },
         },
         webhook_url: "https://webhook.site/seu-webhook-teste", // Webhook fictício
@@ -238,24 +246,62 @@ export default function WhatsappSender() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="valor">Valor Solicitado (R$)</Label>
+                      <Label htmlFor="data_solicitacao">Data da Solicitação</Label>
+                      <Input 
+                        id="data_solicitacao" 
+                        name="data_solicitacao" 
+                        type="date" 
+                        value={formData.data_solicitacao}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="data_liberacao">Data de Liberação</Label>
+                      <Input 
+                        id="data_liberacao" 
+                        name="data_liberacao" 
+                        type="date" 
+                        value={formData.data_liberacao}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="valor">Valor Liberado (R$)</Label>
                       <Input 
                         id="valor" 
                         name="valor" 
                         type="number" 
-                        placeholder="Ex: 5000" 
+                        placeholder="Ex: 7800" 
                         value={formData.valor}
                         onChange={handleInputChange}
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="parcelas">Qtd. Parcelas</Label>
+                      <Label htmlFor="iof">IOF (R$)</Label>
+                      <Input 
+                        id="iof" 
+                        name="iof" 
+                        type="number" 
+                        step="0.01"
+                        placeholder="Ex: 150.00" 
+                        value={formData.iof}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="parcelas">Prazo (meses)</Label>
                       <Input 
                         id="parcelas" 
                         name="parcelas" 
                         type="number" 
-                        placeholder="Ex: 12" 
+                        placeholder="Ex: 24" 
                         value={formData.parcelas}
                         onChange={handleInputChange}
                         required
@@ -265,14 +311,14 @@ export default function WhatsappSender() {
 
                   <div className="grid grid-cols-3 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="taxa">Taxa a.m. (%)</Label>
+                      <Label htmlFor="taxa_nominal">Taxa Nominal (%)</Label>
                       <Input 
-                        id="taxa" 
-                        name="taxa" 
+                        id="taxa_nominal" 
+                        name="taxa_nominal" 
                         type="number" 
                         step="0.01"
-                        placeholder="Ex: 1.5" 
-                        value={formData.taxa}
+                        placeholder="Ex: 1.64" 
+                        value={formData.taxa_nominal}
                         onChange={handleInputChange}
                         required
                       />

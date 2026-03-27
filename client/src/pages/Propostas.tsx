@@ -14,6 +14,7 @@ curl -X POST https://api-angar-homologacao.onrender.com/v1/propostas \\
   -H "Authorization: Bearer $TOKEN" \\
   -d '{
     "id_proposta_parceiro": "PROP-XYZ-98765",
+    "data_solicitacao": "2026-03-12",
     "cliente": {
       "nome": "Maria Joaquina de Amaral Pereira",
       "cpf": "123.456.789-00",
@@ -29,13 +30,15 @@ curl -X POST https://api-angar-homologacao.onrender.com/v1/propostas \\
         "bruto": 3764.16
       },
       "taxas": {
+        "nominal_am": 1.64,
         "cet_am": 8.40,
         "cet_aa": 163.11
       },
       "prazos": {
         "total_parcelas": 24,
-        "primeiro_vencimento": "2026-01-15",
-        "ultimo_vencimento": "2027-12-15"
+        "data_liberacao_estimada": "2026-03-15",
+        "primeiro_vencimento": "2026-04-15",
+        "ultimo_vencimento": "2028-03-15"
       }
     },
     "webhook_url": "https://api.seu-sistema.com/webhook/parcred"
@@ -115,6 +118,12 @@ curl -X POST https://api-angar-homologacao.onrender.com/v1/propostas \\
                     <TableCell>String</TableCell>
                     <TableCell>Sim</TableCell>
                     <TableCell>ID único da proposta no seu sistema</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="font-mono">data_solicitacao</TableCell>
+                    <TableCell>String</TableCell>
+                    <TableCell>Sim</TableCell>
+                    <TableCell>Data da solicitação (YYYY-MM-DD)</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell className="font-mono">cliente</TableCell>
@@ -239,6 +248,11 @@ curl -X POST https://api-angar-homologacao.onrender.com/v1/propostas \\
                   </TableHeader>
                   <TableBody>
                     <TableRow>
+                      <TableCell className="font-mono">nominal_am</TableCell>
+                      <TableCell>Number</TableCell>
+                      <TableCell>Taxa nominal ao mês (%)</TableCell>
+                    </TableRow>
+                    <TableRow>
                       <TableCell className="font-mono">cet_am</TableCell>
                       <TableCell>Number</TableCell>
                       <TableCell>CET ao mês (%)</TableCell>
@@ -269,6 +283,12 @@ curl -X POST https://api-angar-homologacao.onrender.com/v1/propostas \\
                       <TableCell>Number</TableCell>
                       <TableCell>-</TableCell>
                       <TableCell>Número total de parcelas</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-mono">data_liberacao_estimada</TableCell>
+                      <TableCell>String</TableCell>
+                      <TableCell>YYYY-MM-DD</TableCell>
+                      <TableCell>Data estimada para liberação do crédito</TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell className="font-mono">primeiro_vencimento</TableCell>
