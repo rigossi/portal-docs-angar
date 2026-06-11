@@ -17,12 +17,12 @@ export default function StatusPage() {
   const [services, setServices] = useState<ServiceStatus[]>([
     {
       name: "API de Homologação",
-      url: "https://api-angar-homologacao.onrender.com/health",
+      url: "https://api-angar-homologacao.up.railway.app/health",
       status: "checking",
     },
     {
       name: "API de Produção",
-      url: "https://api-angar-producao.onrender.com/health",
+      url: "https://api-angar-producao.up.railway.app/health",
       status: "checking",
     },
   ]);

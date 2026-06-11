@@ -12,8 +12,8 @@ import DocsLayout from "@/components/DocsLayout";
 type Environment = "homologacao" | "producao";
 
 const ENV_URLS = {
-  homologacao: "https://api-angar-homologacao.onrender.com",
-  producao: "https://api-angar-producao.onrender.com"
+  homologacao: "https://api-angar-homologacao.up.railway.app",
+  producao: "https://api-angar-producao.up.railway.app"
 };
 
 const DEFAULT_PAYLOAD = {

@@ -74,8 +74,8 @@ export default function WhatsappSender() {
     setLogs([]); // Limpar logs anteriores
 
     const baseUrl = environment === "producao" 
-      ? "https://api-angar-producao.onrender.com" 
-      : "https://api-angar-homologacao.onrender.com";
+      ? "https://api-angar-producao.up.railway.app" 
+      : "https://api-angar-homologacao.up.railway.app";
 
     try {
       // 1. Validar Token
